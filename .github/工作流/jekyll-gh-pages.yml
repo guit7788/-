@@ -1,0 +1,97 @@
+# Sample workflow for building and deploying a Jekyll site to GitHub Pages
+name: Deploy Jekyll with GitHub Pages dependencies preinstalled
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
+- name: branch-deploy
+  uses: github/branch-deploy@v4.3.0
+  with:
+    # The GitHub token used to create an authenticated client - Provided for you by default!
+    github_token: # default is ${{ github.token }}
+    # The status of the GitHub Actions - For use in the post run workflow - Provided for you by default!
+    status: # default is ${{ job.status }}
+    # The name of the default environment to deploy to. Example: by default, if you type `.deploy`, it will assume "production" as the default environment
+    environment: # optional, default is production
+    # Optional (or additional) target environments to select for use with deployments. Example, "production,development,staging". Example  usage: `.deploy to development`, `.deploy to production`, `.deploy to staging`
+    environment_targets: # optional, default is production,development,staging
+    # The name of the production environment. Example: "production". By default, GitHub will set the "production_environment" to "true" if the environment name is "production". This option allows you to override that behavior so you can use "prod", "prd", "main", etc. as your production environment name.
+    production_environment: # optional, default is production
+    # If set, the specified emoji "reaction" is put on the comment to indicate that the trigger was detected. For example, "rocket" or "eyes"
+    reaction: # optional, default is eyes
+    # The string to look for in comments as an IssueOps trigger. Example: ".deploy"
+    trigger: # optional, default is .deploy
+    # The string to look for in comments as an IssueOps noop trigger. Example: "noop"
+    noop_trigger: # optional, default is noop
+    # The string to look for in comments as an IssueOps lock trigger. Used for locking branch deployments on a specific branch. Example: ".lock"
+    lock_trigger: # optional, default is .lock
+    # The string to look for in comments as an IssueOps unlock trigger. Used for unlocking branch deployments. Example: ".unlock"
+    unlock_trigger: # optional, default is .unlock
+    # The string to look for in comments as an IssueOps help trigger. Example: ".help"
+    help_trigger: # optional, default is .help
+    # An alias or shortcut to get details about the current lock (if it exists) Example: ".info"
+    lock_info_alias: # optional, default is .wcid
+    # The name of a stable branch to deploy to (rollbacks). Example: "main"
+    stable_branch: # optional, default is main
+    # If "false", the trigger can match anywhere in the comment
+    prefix_only: # optional, default is true
+    # Determine how you want this Action to handle "out-of-date" branches. Available options: "disabled", "warn", "force". "disabled" means that the Action will not care if a branch is out-of-date. "warn" means that the Action will warn the user that a branch is out-of-date and exit without deploying. "force" means that the Action will force update the branch. Note: The "force" option is not recommended due to Actions not being able to re-run CI on commits originating from Actions itself
+    update_branch: # optional, default is warn
+    # Manually enforce commit status checks before a deployment can continue. Only use this option if you wish to manually override the settings you have configured for your branch protection settings for your GitHub repository. Default is "false" - Example value: "context1,context2,context3" - In most cases you will not need to touch this option
+    required_contexts: # optional, default is false
+    # A comma seperated list of environments that will not use passing CI as a requirement for deployment. Use this option to explicitly bypass branch protection settings for a certain environment in your repository. Default is an empty string "" - Example: "development,staging"
+    skip_ci: # optional, default is 
+    # A comma seperated list of environment that will not use reviews/approvals as a requirement for deployment. Use this options to explicitly bypass branch protection settings for a certain environment in your repository. Default is an empty string "" - Example: "development,staging"
+    skip_reviews: # optional, default is 
+    # Allow branch deployments to run on repository forks. If you want to harden your workflows, this option can be set to false. Default is "true"
+    allow_forks: # optional, default is true
+    # A comma seperated list of GitHub usernames or teams that should be considered admins by this Action. Admins can deploy pull requests without the need for branch protection approvals. Example: "monalisa,octocat,my-org/my-team"
+    admins: # optional, default is false
+    # A GitHub personal access token with "read:org" scopes. This is only needed if you are using the "admins" option with a GitHub org team. For example: "my-org/my-team"
+    admins_pat: # optional, default is false
+    # This is an advanced option that is an alternate workflow bundled into this Action. You can control how merge commits are handled when a PR is merged into your repository's default branch. If the merge commit SHA matches the latest deployment for the same environment, then the 'continue' output will be set to 'false' which indicates that a deployment should not be performed again as the latest deployment is identical. If the merge commit SHA does not match the latest deployment for the same environment, then the 'continue' output will be set to 'true' which indicates that a deployment should be performed. With this option, the 'environment' output is also set for subsequent steps to reference
+    merge_deploy_mode: # optional, default is false
